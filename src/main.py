@@ -6,7 +6,8 @@ SIZE = WIDTH, HEIGHT = (600, 600)
 
 # A grid of cells with randomly placed mines
 class Minefield:
-    pass
+    def __init__(self, game_mode):
+        pass
 
 # A cell contains its location, if it has a mine, and if it has been clicked on
 class Cell:
