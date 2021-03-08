@@ -4,8 +4,38 @@ from random import randrange
 
 SIZE = WIDTH, HEIGHT = (600, 600)
 
-# A grid of cells with randomly placed mines
 class Minefield:
+    # A cell contains its location, if it has a mine, and if it has been clicked on
+    class Cell:
+        def __init__(self, position, has_mine):
+            self.position = position
+            self.has_mine = has_mine
+            self.clicked = False
+            self.neighbors = 0
+
+            self.color = pygame.Color('blue')
+        
+        def render(self, surface):
+            pygame.draw.rect(surface, self.color, ())
+
+        def check_neighbors(self, minefield):
+            neighbors = [
+                (self.position[0] - 1, self.position[1] - 1),
+                (self.position[0]    , self.position[1] - 1),
+                (self.position[0] + 1, self.position[1] - 1),
+                (self.position[0] + 1, self.position[1]    ),
+                (self.position[0] + 1, self.position[1] + 1),
+                (self.position[0]    , self.position[1] + 1),
+                (self.position[0] - 1, self.position[1] + 1),
+                (self.position[0] - 1, self.position[1]    )
+            ]
+
+            for neighbor in neighbors:
+                if neighbor[0] > -1 and neighbor[0] < minefield.horizontal_count[0] and neighbor[1] > -1 and neighbor[1] < minefield.vertical_count[1]:
+                    if minefield.cells[neighbor[1]][neighbor[0]].has_mine:
+                        self.neighbors += 1
+
+    """A grid of cells with randomly placed mines"""
     def __init__(self, game_mode):
         self.cells = []
         self.cell_color = pygame.Color('blue')
@@ -19,7 +49,7 @@ class Minefield:
         for y in range(self.horizontal_count):
             self.cells.append([])
             for x in range(self.vertical_count):
-                self.cells[y].append(0)
+                self.cells[y].append(self.Cell((x, y), False))
 
         # Places the mines onto the minefield
         mine_count = self.mines
@@ -27,8 +57,8 @@ class Minefield:
             x = randrange(self.horizontal_count)
             y = randrange(self.vertical_count)
 
-            if self.cells[y][x] == 0:
-                self.cells[y][x] = 1
+            if not self.cells[y][x].has_mine:
+                self.cells[y][x].has_mine = True
                 mine_count -= 1
     
     def render(self, surface):
@@ -36,13 +66,9 @@ class Minefield:
             for x in range(self.vertical_count):
                 pygame.draw.rect(
                     surface, 
-                    self.cell_color if self.cells[y][x] == 0 else (200, 0, 0), 
+                    (200, 0, 0) if self.cells[y][x].has_mine else self.cell_color, 
                     (x * self.cell_width + 1, y * self.cell_height + 1, self.cell_width - 2, self.cell_height - 2)
                 )
-
-# A cell contains its location, if it has a mine, and if it has been clicked on
-class Cell:
-    pass
 
 # The first screen the player sees, the menu is a navigation hub to different parts of the game
 def menu():
@@ -73,7 +99,7 @@ def game_over():
 def main():
     pygame.init()
 
-    minefield = Minefield({'mines': 9, 'width': 9, 'height': 9})
+    minefield = Minefield({'mines': 10, 'width': 9, 'height': 9})
 
     canvas = pygame.display.set_mode(SIZE)
     clock = pygame.time.Clock()
