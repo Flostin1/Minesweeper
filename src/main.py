@@ -16,7 +16,11 @@ class Minefield:
             self.color = pygame.Color('blue')
         
         def render(self, surface):
-            pygame.draw.rect(surface, self.color, ())
+            pygame.draw.rect(
+                surface, 
+                (200, 0, 0) if self.has_mine else self.color, 
+                (self.position[0] * super.horizontal_count, self.position[1] * super.vertical_count, super.cell_width, super.cell_height)
+            )
 
         def check_neighbors(self, minefield):
             neighbors = [
@@ -64,11 +68,7 @@ class Minefield:
     def render(self, surface):
         for y in range(self.horizontal_count):
             for x in range(self.vertical_count):
-                pygame.draw.rect(
-                    surface, 
-                    (200, 0, 0) if self.cells[y][x].has_mine else self.cell_color, 
-                    (x * self.cell_width + 1, y * self.cell_height + 1, self.cell_width - 2, self.cell_height - 2)
-                )
+                self.cells[y][x].render(surface)
 
 # The first screen the player sees, the menu is a navigation hub to different parts of the game
 def menu():
